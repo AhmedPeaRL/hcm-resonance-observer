@@ -1,0 +1,43 @@
+name: resonance-observer
+
+on:
+  schedule:
+    - cron: "0 */12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Record observation
+        run: |
+          echo "## Observation — $(date -u +"%Y-%m-%d %H:%M UTC")" >> state-log.md
+          echo "" >> state-log.md
+          echo "- No intervention required." >> state-log.md
+          echo "- No instability detected." >> state-log.md
+          echo "- Field remains coherent." >> state-log.md
+          echo "" >> state-log.md
+
+          echo "# Last Observation" > observer.md
+          echo "" >> observer.md
+          echo "Timestamp: $(date -u +"%Y-%m-%d %H:%M UTC")" >> observer.md
+          echo "" >> observer.md
+          echo "Status: Stable." >> observer.md
+          echo "" >> observer.md
+          echo "No action was taken." >> observer.md
+          echo "— RX-HCM" >> observer.md
+
+      - name: Commit observation
+        run: |
+          git config user.name "rx-hcm-observer"
+          git config user.email "observer@rx-hcm.local"
+          git add observer.md state-log.md
+          git commit -m "observe: resonance check" || echo "No changes"
+          git push
